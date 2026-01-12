@@ -1,12 +1,30 @@
 'use client';
 
-import { Cloud, Droplets, Wind, MapPin, Star, Loader2 } from 'lucide-react';
+import {
+  Cloud,
+  Droplets,
+  Wind,
+  MapPin,
+  Star,
+  Loader2,
+  Thermometer,
+  ThermometerSun,
+  ThermometerSnowflake,
+} from 'lucide-react';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 
 import { useWeather } from '@/entities/model/weatherContext';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import queryFactories from '@/entities/api/queryFactories';
 
-export default function CurrentWeather() {
+export default function CurrentWeather({
+  lat,
+  lon,
+}: {
+  lat: string;
+  lon: string;
+}) {
   const {
     currentLocation,
     setCurrentLocation,
@@ -21,15 +39,26 @@ export default function CurrentWeather() {
     setError,
   } = useWeather();
 
+  const { data: currentWeatherData } = useSuspenseQuery(
+    queryFactories.getCurrentWeatherQueryOptions({ lat, lon })
+  );
+
+  const { data: hourlyWeatherData } = useSuspenseQuery(
+    queryFactories.getHourlyWeatherQueryOptions()
+  );
+
+  console.log('현재 날씨', currentWeatherData);
+  console.log('시간대별 날씨', hourlyWeatherData);
+
   return (
     <Card className='p-4! overflow-hidden bg-white/10 border-white/20 backdrop-blur-xl shadow-2xl w-full max-w-xl hover:bg-white/15 transition-colors duration-500 animate-in zoom-in-95 fade-in duration-700 delay-150 fill-mode-forwards'>
-      <CardContent className='p-8'>
-        <div className='flex items-start justify-between'>
+      <CardContent className='p-8 flex flex-col gap-4'>
+        <div className='flex justify-between items-center'>
           <div className='flex items-center gap-2'>
             <MapPin className='h-5 w-5 text-blue-300' />
             <div>
               <h2 className='text-2xl font-bold text-white tracking-wide'>
-                {currentLocation?.name}
+                {currentWeatherData.name}
               </h2>
               <p className='text-sm text-blue-200/70 font-medium'>
                 {currentLocation?.fullAddress}
@@ -47,58 +76,40 @@ export default function CurrentWeather() {
           </Button>
         </div>
 
-        <div className='mt-10 flex items-center justify-between'>
-          <div className='flex items-center gap-6'>
-            <span className='text-8xl drop-shadow-lg filter'>
-              {/* {weatherIcons[currentWeather?.icon] || '☁️'} */}
-            </span>
+        <div className='mt-10 grid grid-cols-3 gap-4'>
+          <div className='flex items-center gap-4 rounded-2xl bg-white/5 border border-white/10 p-5! hover:bg-white/10 transition-colors'>
+            <Thermometer className='h-6 w-6 text-blue-400' />
             <div>
-              <p className='text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-white/70 tracking-tighter'>
-                {currentWeather?.temp}°
+              <p className='text-xs text-blue-200/60 uppercase tracking-wider font-semibold'>
+                현재 기온
               </p>
-              <p className='text-xl text-blue-100/80 font-medium capitalize mt-1'>
-                {currentWeather?.description}
+              <p className='font-bold text-white text-xl'>
+                {currentWeatherData.main.temp}
+                <span className='text-sm font-normal text-white/50'>°C</span>
               </p>
             </div>
           </div>
-
-          <div className='text-right space-y-1'>
-            <p className='text-sm text-blue-200/60 font-medium'>
-              High{' '}
-              <span className='font-bold text-white text-lg ml-1'>
-                {currentWeather?.tempMax}°
-              </span>
-            </p>
-            <p className='text-sm text-blue-200/60 font-medium'>
-              Low{' '}
-              <span className='font-bold text-white text-lg ml-1'>
-                {currentWeather?.tempMin}°
-              </span>
-            </p>
-          </div>
-        </div>
-
-        <div className='mt-10 grid grid-cols-2 gap-4'>
-          <div className='flex items-center gap-4 rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition-colors'>
-            <Droplets className='h-6 w-6 text-blue-400' />
+          <div className='flex items-center gap-4 rounded-2xl bg-white/5 border border-white/10 p-5! hover:bg-white/10 transition-colors'>
+            <ThermometerSun className='h-6 w-6 text-red-400' />
             <div>
               <p className='text-xs text-blue-200/60 uppercase tracking-wider font-semibold'>
-                Humidity
+                최고 기온
               </p>
               <p className='font-bold text-white text-xl'>
-                {currentWeather?.humidity}%
+                {currentWeatherData.main.temp_max}{' '}
+                <span className='text-sm font-normal text-white/50'>°C</span>
               </p>
             </div>
           </div>
-          <div className='flex items-center gap-4 rounded-2xl bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition-colors'>
-            <Wind className='h-6 w-6 text-blue-400' />
+          <div className='flex items-center gap-4 rounded-2xl bg-white/5 border border-white/10 p-5! hover:bg-white/10 transition-colors'>
+            <ThermometerSnowflake className='h-6 w-6 text-blue-400' />
             <div>
               <p className='text-xs text-blue-200/60 uppercase tracking-wider font-semibold'>
-                Wind Speed
+                최저 기온
               </p>
               <p className='font-bold text-white text-xl'>
-                {currentWeather?.windSpeed}{' '}
-                <span className='text-sm font-normal text-white/50'>m/s</span>
+                {currentWeatherData.main.temp_min}{' '}
+                <span className='text-sm font-normal text-white/50'>°C</span>
               </p>
             </div>
           </div>
