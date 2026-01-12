@@ -32,7 +32,7 @@ const queryFactories = {
       },
     }),
 
-  getHourlyWeatherQueryOptions: () =>
+  getHourlyWeatherQueryOptions: ({ lat, lon }: { lat: string; lon: string }) =>
     queryOptions({
       queryKey: [
         ...queryFactories.all,
@@ -40,7 +40,7 @@ const queryFactories = {
       ],
       queryFn: async () => {
         const response = await fetch(
-          `${HOURLY_BASE_URL}&lat=37.5665&lon=126.9780`,
+          `${HOURLY_BASE_URL}&lat=${lat}&lon=${lon}&cnt=24`,
           {
             method: 'GET',
             headers: {

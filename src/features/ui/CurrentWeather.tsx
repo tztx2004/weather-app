@@ -1,68 +1,60 @@
 'use client';
 
 import {
-  Cloud,
-  Droplets,
-  Wind,
   MapPin,
   Star,
-  Loader2,
   Thermometer,
   ThermometerSun,
   ThermometerSnowflake,
 } from 'lucide-react';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
+import { getRegionName } from '@/entities/api/groq';
+import { useEffect, useState } from 'react';
 
-import { useWeather } from '@/entities/model/weatherContext';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import queryFactories from '@/entities/api/queryFactories';
 
 export default function CurrentWeather({
   lat,
   lon,
+  region,
 }: {
   lat: string;
   lon: string;
+  region?: string;
 }) {
-  const {
-    currentLocation,
-    setCurrentLocation,
-    currentWeather,
-    setCurrentWeather,
-    setHourlyWeather,
-    favorites,
-    addFavorite,
-    isLoading,
-    setIsLoading,
-    error,
-    setError,
-  } = useWeather();
-
   const { data: currentWeatherData } = useSuspenseQuery(
     queryFactories.getCurrentWeatherQueryOptions({ lat, lon })
   );
 
-  const { data: hourlyWeatherData } = useSuspenseQuery(
-    queryFactories.getHourlyWeatherQueryOptions()
-  );
+  const [regionName, setRegionName] = useState<string>(region || '');
 
-  console.log('현재 날씨', currentWeatherData);
-  console.log('시간대별 날씨', hourlyWeatherData);
+  useEffect(() => {
+    if (region) {
+      setRegionName(region);
+      return;
+    }
+
+    async function fetchRegionName() {
+      const result = await getRegionName({ lat, lon });
+      if (result && result.city) {
+        setRegionName(result.city);
+      }
+    }
+    fetchRegionName();
+  }, [lat, lon, region]);
 
   return (
-    <Card className='p-4! overflow-hidden bg-white/10 border-white/20 backdrop-blur-xl shadow-2xl w-full max-w-xl hover:bg-white/15 transition-colors duration-500 animate-in zoom-in-95 fade-in duration-700 delay-150 fill-mode-forwards'>
+    <Card className='p-4! overflow-hidden bg-white/10 border-white/20 backdrop-blur-xl shadow-2xl w-full max-w-xl hover:bg-white/15 transition-colors animate-in zoom-in-95 fade-in duration-700 delay-150 fill-mode-forwards'>
       <CardContent className='p-8 flex flex-col gap-4'>
         <div className='flex justify-between items-center'>
           <div className='flex items-center gap-2'>
-            <MapPin className='h-5 w-5 text-blue-300' />
+            <MapPin className='h-5 w-5 text-white!' />
             <div>
               <h2 className='text-2xl font-bold text-white tracking-wide'>
-                {currentWeatherData.name}
+                {regionName || currentWeatherData.name}
               </h2>
-              <p className='text-sm text-blue-200/70 font-medium'>
-                {currentLocation?.fullAddress}
-              </p>
             </div>
           </div>
           <Button
