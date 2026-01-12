@@ -1,15 +1,14 @@
 'use client';
 
-import { Search, MapPin, Star, X } from 'lucide-react';
+import { Search, MapPin, X } from 'lucide-react';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 
-import { cn } from '@/lib/utils';
 import { groqRequest } from '@/entities/api/groq';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import koreaDistricts from '../../../korea_districts.json';
+import koreaDistricts from '@/shared/api/korea_districts.json';
 
 export default function SearchBar() {
   const [location, setLocation] = useState<string>('');

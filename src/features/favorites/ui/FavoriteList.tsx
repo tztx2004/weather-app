@@ -1,6 +1,6 @@
 'use client';
 
-import { useFavorites } from '../model/useFavorites';
+import { useFavorites } from '../../../entities/model/useFavorites';
 import FavoriteCard from './FavoriteCard';
 import { Plus } from 'lucide-react';
 

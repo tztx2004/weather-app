@@ -8,7 +8,7 @@ import { Input } from '@/shared/ui/input';
 import { Pencil, Trash2, MapPin, X, Check } from 'lucide-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import queryFactories from '@/entities/api/queryFactories';
-import { FavoriteLocation } from '../model/useFavorites';
+import { FavoriteLocation } from '../../../entities/model/useFavorites';
 
 export default function FavoriteCard({
   favorite,
