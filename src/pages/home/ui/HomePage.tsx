@@ -3,6 +3,8 @@ import SearchBar from '@/features/ui/SearchBar';
 
 import { HourlyForecast } from '@/features/ui/HourlyForecast';
 import LocationRedirector from '@/features/ui/LocationRedirector';
+import FavoriteList from '@/features/favorites/ui/FavoriteList';
+import { FavoritesProvider } from '@/features/favorites/model/useFavorites';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { getQueryClient } from '@/app/layouts/get-query-client';
 import queryFactories from '@/entities/api/queryFactories';
@@ -50,13 +52,16 @@ export default async function HomePage(props: {
           Korea Weather Now
         </h1>
         <div className='w-full flex flex-col items-center gap-6'>
-          <SearchBar />
-          <CurrentWeather
-            lat={searchParams.lat}
-            lon={searchParams.lon}
-            region={searchParams.region}
-          />
-          <HourlyForecast lat={searchParams.lat} lon={searchParams.lon} />
+          <FavoritesProvider>
+            <SearchBar />
+            <CurrentWeather
+              lat={searchParams.lat}
+              lon={searchParams.lon}
+              region={searchParams.region}
+            />
+            <HourlyForecast lat={searchParams.lat} lon={searchParams.lon} />
+            <FavoriteList />
+          </FavoritesProvider>
         </div>
       </main>
     </HydrationBoundary>
